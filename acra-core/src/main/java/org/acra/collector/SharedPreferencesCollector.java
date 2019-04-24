@@ -122,4 +122,9 @@ public final class SharedPreferencesCollector extends BaseReportFieldCollector {
         }
         return false;
     }
+
+    @Override
+    public boolean enabled(@NonNull CoreConfiguration config) {
+        return true;
+    }
 }

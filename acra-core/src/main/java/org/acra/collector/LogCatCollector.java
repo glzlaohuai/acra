@@ -93,7 +93,12 @@ public final class LogCatCollector extends BaseReportFieldCollector {
         if (ACRA.DEV_LOGGING) ACRA.log.d(LOG_TAG, "Retrieving logcat output (buffer:" + (bufferName == null ? "default" : bufferName) + ")...");
 
         try {
-            return streamToString(config, process.getInputStream(), myPidStr == null ? null : s -> s.contains(myPidStr), tailCount);
+            return streamToString(config, process.getInputStream(), myPidStr == null ? null : new Predicate<String>() {
+                @Override
+                public boolean apply(String s) {
+                    return s.contains(myPidStr);
+                }
+            }, tailCount);
         } finally {
             process.destroy();
         }
@@ -139,5 +144,10 @@ public final class LogCatCollector extends BaseReportFieldCollector {
             reader.setTimeout(READ_TIMEOUT);
         }
         return reader.read();
+    }
+
+    @Override
+    public boolean enabled(@NonNull CoreConfiguration config) {
+        return true;
     }
 }

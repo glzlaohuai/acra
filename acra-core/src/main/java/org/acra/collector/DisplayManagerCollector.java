@@ -233,4 +233,9 @@ public final class DisplayManagerCollector extends BaseReportFieldCollector {
         }
         return result.toString();
     }
+
+    @Override
+    public boolean enabled(@NonNull CoreConfiguration config) {
+        return true;
+    }
 }

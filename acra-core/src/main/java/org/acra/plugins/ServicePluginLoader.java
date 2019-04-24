@@ -35,12 +35,22 @@ public class ServicePluginLoader implements PluginLoader {
 
     @Override
     public <T extends Plugin> List<T> load(@NonNull Class<T> clazz) {
-        return loadInternal(clazz, plugin -> true);
+        return loadInternal(clazz, new Predicate<T>() {
+            @Override
+            public boolean apply(T plugin) {
+                return true;
+            }
+        });
     }
 
     @Override
-    public <T extends Plugin> List<T> loadEnabled(@NonNull CoreConfiguration config, @NonNull Class<T> clazz) {
-        return loadInternal(clazz, plugin -> plugin.enabled(config));
+    public <T extends Plugin> List<T> loadEnabled(@NonNull final CoreConfiguration config, @NonNull Class<T> clazz) {
+        return loadInternal(clazz, new Predicate<T>() {
+            @Override
+            public boolean apply(T plugin) {
+                return plugin.enabled(config);
+            }
+        });
     }
 
     private <T extends Plugin> List<T> loadInternal(@NonNull Class<T> clazz, Predicate<T> shouldLoadPredicate) {

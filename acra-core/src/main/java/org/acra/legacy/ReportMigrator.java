@@ -80,7 +80,12 @@ final class ReportMigrator {
         if (ACRA.DEV_LOGGING) ACRA.log.d(LOG_TAG, "Looking for error files in " + dir.getAbsolutePath());
 
         // Filter for ".stacktrace" files
-        final FilenameFilter filter = (dir1, name) -> name.endsWith(ACRAConstants.REPORTFILE_EXTENSION);
+        final FilenameFilter filter = new FilenameFilter() {
+            @Override
+            public boolean accept(File dir1, String name) {
+                return name.endsWith(ACRAConstants.REPORTFILE_EXTENSION);
+            }
+        };
         final File[] result = dir.listFiles(filter);
         return (result == null) ? new File[0] : result;
     }

@@ -21,9 +21,11 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.widget.Toast;
 import com.google.auto.service.AutoService;
 import org.acra.ACRA;
+import org.acra.builder.LastActivityManager;
 import org.acra.builder.ReportBuilder;
 import org.acra.data.CrashReportData;
 import org.acra.file.ReportLocator;
@@ -112,11 +114,14 @@ public class LimitingReportAdministrator extends HasConfigPlugin implements Repo
                 ToastSender.sendToast(context, limiterConfiguration.ignoredCrashToast(), Toast.LENGTH_LONG);
                 final Looper looper = Looper.myLooper();
                 if (looper != null) {
-                    new Handler(looper).postDelayed(() -> {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                            looper.quitSafely();
-                        } else {
-                            looper.quit();
+                    new Handler(looper).postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                                looper.quitSafely();
+                            } else {
+                                looper.quit();
+                            }
                         }
                     }, 4000);
                     Looper.loop();
@@ -132,6 +137,16 @@ public class LimitingReportAdministrator extends HasConfigPlugin implements Repo
                 }
             }
         }
+    }
+
+    @Override
+    public boolean shouldFinishActivity(@NonNull Context context, @NonNull CoreConfiguration config, LastActivityManager lastActivityManager) {
+        return true;
+    }
+
+    @Override
+    public boolean shouldKillApplication(@NonNull Context context, @NonNull CoreConfiguration config, @NonNull ReportBuilder reportBuilder, @Nullable CrashReportData crashReportData) {
+        return true;
     }
 
     @NonNull

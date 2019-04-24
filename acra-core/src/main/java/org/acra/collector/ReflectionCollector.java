@@ -141,4 +141,9 @@ public final class ReflectionCollector extends BaseReportFieldCollector {
         final String className = context.getPackageName() + ".BuildConfig";
         return Class.forName(className);
     }
+
+    @Override
+    public boolean enabled(@NonNull CoreConfiguration config) {
+        return true;
+    }
 }

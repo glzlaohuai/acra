@@ -60,11 +60,14 @@ public final class ProcessFinisher {
     public void finishLastActivity(@Nullable Thread uncaughtExceptionThread) {
         if (ACRA.DEV_LOGGING) ACRA.log.d(LOG_TAG, "Finishing activities prior to killing the Process");
         boolean wait = false;
-        for(Activity activity : lastActivityManager.getLastActivities()) {
+        for(final Activity activity : lastActivityManager.getLastActivities()) {
             final boolean isMainThread = uncaughtExceptionThread == activity.getMainLooper().getThread();
-            final Runnable finisher = () -> {
-                activity.finish();
-                if (ACRA.DEV_LOGGING) ACRA.log.d(LOG_TAG, "Finished " + activity.getClass());
+            final Runnable finisher = new Runnable() {
+                @Override
+                public void run() {
+                    activity.finish();
+                    if (ACRA.DEV_LOGGING) ACRA.log.d(LOG_TAG, "Finished " + activity.getClass());
+                }
             };
             if (isMainThread) {
                 finisher.run();

@@ -52,4 +52,9 @@ public final class LogFileCollector extends BaseReportFieldCollector {
         target.put(ReportField.APPLICATION_LOG, new StreamReader(config.applicationLogFileDir().getFile(context, config.applicationLogFile()))
                 .setLimit(config.applicationLogFileLines()).read());
     }
+
+    @Override
+    public boolean enabled(@NonNull CoreConfiguration config) {
+        return true;
+    }
 }

@@ -67,7 +67,12 @@ public class SendingConductor {
             final String toast;
             if (anyNonSilent && (toast = reportsSentCount > 0 ? config.reportSendSuccessToast() : config.reportSendFailureToast()) != null) {
                 if (ACRA.DEV_LOGGING) ACRA.log.d(LOG_TAG, "About to show " + (reportsSentCount > 0 ? "success" : "failure") + " toast");
-                new Handler(Looper.getMainLooper()).post(() -> ToastSender.sendToast(context, toast, Toast.LENGTH_LONG));
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        ToastSender.sendToast(context, toast, Toast.LENGTH_LONG);
+                    }
+                });
             }
         } catch (Exception e) {
             ACRA.log.e(LOG_TAG, "", e);

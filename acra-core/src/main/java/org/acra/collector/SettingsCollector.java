@@ -103,4 +103,9 @@ public final class SettingsCollector extends BaseReportFieldCollector {
         }
         return true;
     }
+
+    @Override
+    public boolean enabled(@NonNull CoreConfiguration config) {
+        return true;
+    }
 }

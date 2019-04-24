@@ -98,4 +98,9 @@ public final class StacktraceCollector extends BaseReportFieldCollector {
 
         return Integer.toHexString(res.toString().hashCode());
     }
+
+    @Override
+    public boolean enabled(@NonNull CoreConfiguration config) {
+        return true;
+    }
 }

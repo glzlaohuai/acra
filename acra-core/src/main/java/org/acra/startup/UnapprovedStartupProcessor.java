@@ -24,6 +24,7 @@ import org.acra.file.LastModifiedComparator;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -43,7 +44,12 @@ public class UnapprovedStartupProcessor implements StartupProcessor {
             }
             if (!sort.isEmpty()) {
                 final LastModifiedComparator comparator = new LastModifiedComparator();
-                Collections.sort(sort, (r1, r2) -> comparator.compare(r1.getFile(), r2.getFile()));
+                Collections.sort(sort, new Comparator<Report>() {
+                    @Override
+                    public int compare(Report r1, Report r2) {
+                        return comparator.compare(r1.getFile(), r2.getFile());
+                    }
+                });
                 if(config.deleteUnapprovedReportsOnApplicationStart()) {
                     for (int i = 0; i < sort.size() - 1; i++) {
                         sort.get(i).delete();
@@ -52,5 +58,10 @@ public class UnapprovedStartupProcessor implements StartupProcessor {
                 sort.get(sort.size() - 1).approve();
             }
         }
+    }
+
+    @Override
+    public boolean enabled(@NonNull CoreConfiguration config) {
+        return true;
     }
 }

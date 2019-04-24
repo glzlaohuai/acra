@@ -28,6 +28,11 @@ import java.util.List;
  * @since 4.9.1
  */
 public class DefaultRetryPolicy implements RetryPolicy {
+
+    public DefaultRetryPolicy() {
+
+    }
+
     @Override
     public boolean shouldRetrySend(@NonNull List<ReportSender> senders, @NonNull List<FailedSender> failedSenders) {
         return (senders.size() == failedSenders.size()) && !senders.isEmpty();

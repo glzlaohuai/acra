@@ -46,6 +46,11 @@ import java.lang.reflect.Modifier;
 @AutoService(Collector.class)
 public final class MediaCodecListCollector extends BaseReportFieldCollector {
 
+    @Override
+    public boolean enabled(@NonNull CoreConfiguration config) {
+        return true;
+    }
+
     private enum CodecType {
         AVC, H263, MPEG4, AAC
 

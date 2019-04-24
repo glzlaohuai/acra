@@ -52,40 +52,48 @@ public class StartupProcessorExecutor {
         this.fileNameParser = new CrashReportFileNameParser();
     }
 
-    public void processReports(boolean isAcraEnabled) {
+    public void processReports(final boolean isAcraEnabled) {
         final Calendar now = Calendar.getInstance();
         //application is not ready in onAttachBaseContext, so delay this. also run it on a background thread because we're doing disk I/O
-        new Handler(context.getMainLooper()).post(() -> new Thread(() -> {
-            final List<Report> reports = new ArrayList<>();
-            for (File r : reportLocator.getUnapprovedReports()) {
-                reports.add(new Report(r, false));
-            }
-            for (File r : reportLocator.getApprovedReports()) {
-                reports.add(new Report(r, true));
-            }
-            final List<StartupProcessor> startupProcessors = config.pluginLoader().loadEnabled(config, StartupProcessor.class);
-            for (StartupProcessor processor : startupProcessors) {
-                processor.processReports(context, config, reports);
-            }
-            boolean send = false;
-            for (Report report : reports) {
-                // ignore reports that were just created for now, they might be handled in another thread
-                if (fileNameParser.getTimestamp(report.getFile().getName()).before(now)) {
-                    if (report.isDelete()) {
-                        if (!report.getFile().delete()) {
-                            ACRA.log.w(LOG_TAG, "Could not delete report " + report.getFile());
+        new Handler(context.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        final List<Report> reports = new ArrayList<>();
+                        for (File r : reportLocator.getUnapprovedReports()) {
+                            reports.add(new Report(r, false));
                         }
-                    } else if (report.isApproved()) {
-                        send = true;
-                    } else if (report.isApprove() && isAcraEnabled) {
-                        new ReportInteractionExecutor(context, config).performInteractions(report.getFile());
+                        for (File r : reportLocator.getApprovedReports()) {
+                            reports.add(new Report(r, true));
+                        }
+                        final List<StartupProcessor> startupProcessors = config.pluginLoader().loadEnabled(config, StartupProcessor.class);
+                        for (StartupProcessor processor : startupProcessors) {
+                            processor.processReports(context, config, reports);
+                        }
+                        boolean send = false;
+                        for (Report report : reports) {
+                            // ignore reports that were just created for now, they might be handled in another thread
+                            if (fileNameParser.getTimestamp(report.getFile().getName()).before(now)) {
+                                if (report.isDelete()) {
+                                    if (!report.getFile().delete()) {
+                                        ACRA.log.w(LOG_TAG, "Could not delete report " + report.getFile());
+                                    }
+                                } else if (report.isApproved()) {
+                                    send = true;
+                                } else if (report.isApprove() && isAcraEnabled) {
+                                    new ReportInteractionExecutor(context, config).performInteractions(report.getFile());
+                                }
+                            }
+                        }
+                        if (send && isAcraEnabled) {
+                            schedulerStarter.scheduleReports(null, false);
+                        }
                     }
-                }
+                }).start();
             }
-            if(send && isAcraEnabled) {
-                schedulerStarter.scheduleReports(null, false);
-            }
-        }).start());
+        });
 
     }
 }

@@ -18,6 +18,7 @@ package org.acra.collector;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+
 import org.acra.builder.ReportBuilder;
 import org.acra.config.CoreConfiguration;
 import org.acra.data.CrashReportData;
@@ -43,9 +44,7 @@ public interface Collector extends Plugin {
      * @return when this collector should be called compared to other collectors
      */
     @NonNull
-    default Order getOrder() {
-        return Order.NORMAL;
-    }
+    Order getOrder();
 
     enum Order {
         FIRST,

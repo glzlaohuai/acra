@@ -18,6 +18,7 @@ package org.acra.collector;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import com.google.auto.service.AutoService;
 
@@ -55,5 +56,10 @@ public final class PackageManagerCollector extends BaseReportFieldCollector {
                     break;
             }
         }
+    }
+
+    @Override
+    public boolean enabled(@NonNull CoreConfiguration config) {
+        return true;
     }
 }

@@ -82,12 +82,19 @@ abstract class BaseReportFieldCollector implements Collector {
     /**
      * Collect a ReportField
      *
-     * @param reportField the reportField to collect
-     * @param context a context
-     * @param config current Configuration
+     * @param reportField   the reportField to collect
+     * @param context       a context
+     * @param config        current Configuration
      * @param reportBuilder current ReportBuilder
-     * @param target put results here
+     * @param target        put results here
      * @throws Exception if collection failed
      */
     abstract void collect(@NonNull ReportField reportField, @NonNull Context context, @NonNull CoreConfiguration config, @NonNull ReportBuilder reportBuilder, @NonNull CrashReportData target) throws Exception;
+
+
+    @NonNull
+    @Override
+    public Order getOrder() {
+        return Order.NORMAL;
+    }
 }

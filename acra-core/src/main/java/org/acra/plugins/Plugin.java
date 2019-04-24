@@ -17,6 +17,7 @@
 package org.acra.plugins;
 
 import android.support.annotation.NonNull;
+
 import org.acra.config.CoreConfiguration;
 
 /**
@@ -32,7 +33,5 @@ public interface Plugin {
      * @param config the current config
      * @return if this instance should be called
      */
-    default boolean enabled(@NonNull CoreConfiguration config) {
-        return true;
-    }
+    boolean enabled(@NonNull CoreConfiguration config);
 }

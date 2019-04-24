@@ -27,6 +27,8 @@ import org.acra.plugins.PluginLoader;
 import org.acra.plugins.ServicePluginLoader;
 import org.acra.util.StubCreator;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.util.*;
 
 import static org.acra.ACRA.LOG_TAG;
@@ -142,7 +144,12 @@ public final class BaseCoreConfigurationBuilder {
         }
         if (c.isInterface()) {
             ACRA.log.w(LOG_TAG, "Couldn't find ConfigurationBuilder " + c.getSimpleName() + ". ALL CALLS TO IT WILL BE IGNORED!");
-            return StubCreator.createStub(c, (proxy, method, args) -> proxy);
+            return StubCreator.createStub(c, new InvocationHandler() {
+                @Override
+                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                    return proxy;
+                }
+            });
         }
         throw new IllegalArgumentException("Class " + c.getName() + " is not a registered ConfigurationBuilder");
     }

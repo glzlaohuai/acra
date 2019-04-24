@@ -270,4 +270,9 @@ public final class ConfigurationCollector extends BaseReportFieldCollector imple
             return null;
         }
     }
+
+    @Override
+    public boolean enabled(@NonNull CoreConfiguration config) {
+        return true;
+    }
 }

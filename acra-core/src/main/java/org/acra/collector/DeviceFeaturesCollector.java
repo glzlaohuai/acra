@@ -56,4 +56,9 @@ public final class DeviceFeaturesCollector extends BaseReportFieldCollector {
             }
             target.put(ReportField.DEVICE_FEATURES, result);
     }
+
+    @Override
+    public boolean enabled(@NonNull CoreConfiguration config) {
+        return true;
+    }
 }

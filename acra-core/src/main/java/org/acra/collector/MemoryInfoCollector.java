@@ -138,4 +138,8 @@ public final class MemoryInfoCollector extends BaseReportFieldCollector {
         return totalBlocks * blockSize;
     }
 
+    @Override
+    public boolean enabled(@NonNull CoreConfiguration config) {
+        return true;
+    }
 }

@@ -80,4 +80,9 @@ public final class TimeCollector extends BaseReportFieldCollector implements App
     private String getTimeString(@NonNull Calendar time) {
         return dateFormat.format(time.getTimeInMillis());
     }
+
+    @Override
+    public boolean enabled(@NonNull CoreConfiguration config) {
+        return true;
+    }
 }

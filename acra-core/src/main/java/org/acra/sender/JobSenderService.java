@@ -15,14 +15,17 @@ import org.acra.util.IOUtils;
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
 public class JobSenderService extends JobService {
     @Override
-    public boolean onStartJob(JobParameters params) {
+    public boolean onStartJob(final JobParameters params) {
         PersistableBundle extras = params.getExtras();
-        CoreConfiguration config = IOUtils.deserialize(CoreConfiguration.class, extras.getString(LegacySenderService.EXTRA_ACRA_CONFIG));
-        boolean onlySilent = extras.getBoolean(LegacySenderService.EXTRA_ONLY_SEND_SILENT_REPORTS);
+        final CoreConfiguration config = IOUtils.deserialize(CoreConfiguration.class, extras.getString(LegacySenderService.EXTRA_ACRA_CONFIG));
+        final boolean onlySilent = extras.getBoolean(LegacySenderService.EXTRA_ONLY_SEND_SILENT_REPORTS);
         if (config != null) {
-            new Thread(() -> {
-                new SendingConductor(this, config).sendReports(onlySilent);
-                jobFinished(params, false);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    new SendingConductor(JobSenderService.this, config).sendReports(onlySilent);
+                    JobSenderService.this.jobFinished(params, false);
+                }
             }).start();
         }
         return true;

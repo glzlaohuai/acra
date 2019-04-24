@@ -19,6 +19,9 @@ package org.acra;
 import android.app.Application;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
+import org.acra.builder.LastActivityManager;
 import org.acra.builder.ReportBuilder;
 import org.acra.collector.StacktraceCollector;
 import org.acra.config.CoreConfiguration;
@@ -32,7 +35,9 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * @author lukas
@@ -59,10 +64,35 @@ public class ACRATest {
 
     public static class TestAdministrator implements ReportingAdministrator {
         @Override
+        public boolean shouldStartCollecting(@NonNull Context context, @NonNull CoreConfiguration config, @NonNull ReportBuilder reportBuilder) {
+            return true;
+        }
+
+        @Override
         public boolean shouldSendReport(@NonNull Context context, @NonNull CoreConfiguration config, @NonNull CrashReportData crashReportData) {
             assertTrue(crashReportData.containsKey(ReportField.STACK_TRACE));
             assertThat(crashReportData.getString(ReportField.STACK_TRACE), containsString("RuntimeException"));
             return false;
+        }
+
+        @Override
+        public void notifyReportDropped(@NonNull Context context, @NonNull CoreConfiguration config) {
+
+        }
+
+        @Override
+        public boolean shouldFinishActivity(@NonNull Context context, @NonNull CoreConfiguration config, LastActivityManager lastActivityManager) {
+            return true;
+        }
+
+        @Override
+        public boolean shouldKillApplication(@NonNull Context context, @NonNull CoreConfiguration config, @NonNull ReportBuilder reportBuilder, @Nullable CrashReportData crashReportData) {
+            return true;
+        }
+
+        @Override
+        public boolean enabled(@NonNull CoreConfiguration config) {
+            return true;
         }
     }
 
@@ -71,6 +101,31 @@ public class ACRATest {
         public boolean shouldStartCollecting(@NonNull Context context, @NonNull CoreConfiguration config, @NonNull ReportBuilder reportBuilder) {
             fail("Intended failure to test if assertions work");
             return false;
+        }
+
+        @Override
+        public boolean shouldSendReport(@NonNull Context context, @NonNull CoreConfiguration config, @NonNull CrashReportData crashReportData) {
+            return true;
+        }
+
+        @Override
+        public void notifyReportDropped(@NonNull Context context, @NonNull CoreConfiguration config) {
+
+        }
+
+        @Override
+        public boolean shouldFinishActivity(@NonNull Context context, @NonNull CoreConfiguration config, LastActivityManager lastActivityManager) {
+            return true;
+        }
+
+        @Override
+        public boolean shouldKillApplication(@NonNull Context context, @NonNull CoreConfiguration config, @NonNull ReportBuilder reportBuilder, @Nullable CrashReportData crashReportData) {
+            return true;
+        }
+
+        @Override
+        public boolean enabled(@NonNull CoreConfiguration config) {
+            return true;
         }
     }
 }

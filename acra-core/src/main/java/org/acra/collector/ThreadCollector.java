@@ -60,4 +60,9 @@ public final class ThreadCollector extends BaseReportFieldCollector {
             target.put(ReportField.THREAD_DETAILS, (String) null);
         }
     }
+
+    @Override
+    public boolean enabled(@NonNull CoreConfiguration config) {
+        return true;
+    }
 }

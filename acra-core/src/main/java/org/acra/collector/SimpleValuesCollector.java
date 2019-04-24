@@ -116,4 +116,9 @@ public final class SimpleValuesCollector extends BaseReportFieldCollector {
         }
         return result.toString();
     }
+
+    @Override
+    public boolean enabled(@NonNull CoreConfiguration config) {
+        return true;
+    }
 }

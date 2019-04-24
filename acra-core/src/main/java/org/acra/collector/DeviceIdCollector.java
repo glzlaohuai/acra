@@ -57,4 +57,9 @@ public final class DeviceIdCollector extends BaseReportFieldCollector {
     void collect(@NonNull ReportField reportField, @NonNull Context context, @NonNull CoreConfiguration config, @NonNull ReportBuilder reportBuilder, @NonNull CrashReportData target) throws Exception {
         target.put(ReportField.DEVICE_ID, SystemServices.getTelephonyManager(context).getDeviceId());
     }
+
+    @Override
+    public boolean enabled(@NonNull CoreConfiguration config) {
+        return true;
+    }
 }

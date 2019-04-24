@@ -86,13 +86,13 @@ public class StreamReader {
                 return text;
             }
             final String[] lines = text.split("\\r?\\n");
-            if(lines.length <= limit){
+            if (lines.length <= limit) {
                 return text;
             }
             return TextUtils.join("\n", Arrays.copyOfRange(lines, lines.length - limit, lines.length));
         }
         final String[] lines = text.split("\\r?\\n");
-        final List<String> buffer = limit == NO_LIMIT ? new LinkedList<>() : new BoundedLinkedList<>(limit);
+        final List<String> buffer = limit == NO_LIMIT ? new LinkedList<String>() : new BoundedLinkedList<String>(limit);
         for (String line : lines) {
             if (filter.apply(line)) {
                 buffer.add(line);

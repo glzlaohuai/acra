@@ -43,9 +43,12 @@ public final class ApplicationStartupProcessor {
 
     public void checkReports() {
         //run it on a background thread because we're doing disk I/O
-        new Thread(() -> {
-            if (config.deleteOldUnsentReportsOnApplicationStart()) {
-                deleteUnsentReportsFromOldAppVersion();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if (config.deleteOldUnsentReportsOnApplicationStart()) {
+                    ApplicationStartupProcessor.this.deleteUnsentReportsFromOldAppVersion();
+                }
             }
         }).start();
     }

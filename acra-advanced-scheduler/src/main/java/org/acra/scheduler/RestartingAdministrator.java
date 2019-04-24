@@ -22,12 +22,16 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import com.google.auto.service.AutoService;
 import org.acra.builder.LastActivityManager;
+import org.acra.builder.ReportBuilder;
 import org.acra.config.ConfigUtils;
 import org.acra.config.CoreConfiguration;
 import org.acra.config.ReportingAdministrator;
 import org.acra.config.SchedulerConfiguration;
+import org.acra.data.CrashReportData;
 import org.acra.plugins.HasConfigPlugin;
 
 /**
@@ -43,17 +47,35 @@ public class RestartingAdministrator extends HasConfigPlugin implements Reportin
     }
 
     @Override
+    public boolean shouldStartCollecting(@NonNull Context context, @NonNull CoreConfiguration config, @NonNull ReportBuilder reportBuilder) {
+        return true;
+    }
+
+    @Override
+    public boolean shouldSendReport(@NonNull Context context, @NonNull CoreConfiguration config, @NonNull CrashReportData crashReportData) {
+        return true;
+    }
+
+    @Override
+    public void notifyReportDropped(@NonNull Context context, @NonNull CoreConfiguration config) {
+
+    }
+
+    @Override
     public boolean shouldFinishActivity(@NonNull Context context, @NonNull CoreConfiguration config, LastActivityManager lastActivityManager) {
         if (ConfigUtils.getPluginConfiguration(config, SchedulerConfiguration.class).restartAfterCrash() && lastActivityManager.getLastActivity() != null) {
-            Thread thread = new Thread(() -> {
-                try {
-                    JobScheduler scheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-                    assert scheduler != null;
-                    PersistableBundle extras = new PersistableBundle();
-                    extras.putString(RestartingAdministrator.EXTRA_LAST_ACTIVITY, lastActivityManager.getLastActivity().getClass().getName());
-                    scheduler.schedule(new JobInfo.Builder(0, new ComponentName(context, RestartingService.class)).setExtras(extras).build());
-                } catch (Exception e) {
-                    e.printStackTrace();
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        JobScheduler scheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
+                        assert scheduler != null;
+                        PersistableBundle extras = new PersistableBundle();
+                        extras.putString(RestartingAdministrator.EXTRA_LAST_ACTIVITY, lastActivityManager.getLastActivity().getClass().getName());
+                        scheduler.schedule(new JobInfo.Builder(0, new ComponentName(context, RestartingService.class)).setExtras(extras).build());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             });
             thread.start();
@@ -62,6 +84,11 @@ public class RestartingAdministrator extends HasConfigPlugin implements Reportin
             } catch (InterruptedException ignored) {
             }
         }
+        return true;
+    }
+
+    @Override
+    public boolean shouldKillApplication(@NonNull Context context, @NonNull CoreConfiguration config, @NonNull ReportBuilder reportBuilder, @Nullable CrashReportData crashReportData) {
         return true;
     }
 }
