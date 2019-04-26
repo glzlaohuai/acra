@@ -28,6 +28,11 @@ import java.security.KeyStore;
  * @since 4.9.0
  */
 public class NoKeyStoreFactory implements KeyStoreFactory {
+
+
+    public NoKeyStoreFactory() {
+    }
+
     @Nullable
     @Override
     public KeyStore create(@NonNull Context context) {

@@ -41,24 +41,31 @@ public final class KeyStoreHelper {
 
     /**
      * try to get the keystore
+     *
      * @param context a context
-     * @param config the configuration
+     * @param config  the configuration
      * @return the keystore, or null if none provided / failure
      */
     @Nullable
     public static KeyStore getKeyStore(@NonNull Context context, @NonNull CoreConfiguration config) {
         final HttpSenderConfiguration senderConfiguration = ConfigUtils.getPluginConfiguration(config, HttpSenderConfiguration.class);
         final InstanceCreator instanceCreator = new InstanceCreator();
-        KeyStore keyStore = instanceCreator.create(senderConfiguration.keyStoreFactoryClass(), NoKeyStoreFactory::new).create(context);
-        if(keyStore == null) {
+        KeyStore keyStore = instanceCreator.create(senderConfiguration.keyStoreFactoryClass(), new InstanceCreator.Fallback<KeyStoreFactory>() {
+            @NonNull
+            @Override
+            public KeyStoreFactory get() {
+                return new NoKeyStoreFactory();
+            }
+        }).create(context);
+        if (keyStore == null) {
             //either users factory did not create a keystore, or the configuration is default {@link NoKeyStoreFactory}
             final int certificateRes = senderConfiguration.resCertificate();
             final String certificatePath = senderConfiguration.certificatePath();
             final String certificateType = senderConfiguration.certificateType();
-            if(certificateRes != ACRAConstants.DEFAULT_RES_VALUE){
+            if (certificateRes != ACRAConstants.DEFAULT_RES_VALUE) {
                 keyStore = new ResourceKeyStoreFactory(certificateType, certificateRes).create(context);
-            }else if(!certificatePath.equals(ACRAConstants.DEFAULT_STRING_VALUE)){
-                if(certificatePath.startsWith(ASSET_PREFIX)) {
+            } else if (!certificatePath.equals(ACRAConstants.DEFAULT_STRING_VALUE)) {
+                if (certificatePath.startsWith(ASSET_PREFIX)) {
                     keyStore = new AssetKeyStoreFactory(certificateType, certificatePath.substring(ASSET_PREFIX.length())).create(context);
                 } else {
                     keyStore = new FileKeyStoreFactory(certificateType, certificatePath).create(context);

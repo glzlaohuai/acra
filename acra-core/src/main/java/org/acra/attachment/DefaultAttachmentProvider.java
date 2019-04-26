@@ -37,6 +37,10 @@ import static org.acra.ACRA.LOG_TAG;
 
 public class DefaultAttachmentProvider implements AttachmentUriProvider {
 
+
+    public DefaultAttachmentProvider() {
+    }
+
     /**
      * {@inheritDoc}
      */

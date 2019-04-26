@@ -17,24 +17,39 @@
 package org.acra.processor.creator;
 
 import android.support.annotation.NonNull;
+
 import com.google.auto.common.MoreTypes;
 import com.google.auto.service.AutoService;
-import com.squareup.javapoet.*;
+import com.squareup.javapoet.AnnotationSpec;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterSpec;
+import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
+
 import org.acra.annotation.Configuration;
 import org.acra.config.ConfigurationBuilder;
-import org.acra.processor.element.*;
+import org.acra.processor.element.BuilderElement;
+import org.acra.processor.element.ConfigElement;
+import org.acra.processor.element.Element;
+import org.acra.processor.element.ElementFactory;
+import org.acra.processor.element.ValidatedElement;
 import org.acra.processor.util.Strings;
 import org.acra.processor.util.Types;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.List;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.MirroredTypeException;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.List;
 
-import static org.acra.processor.util.Strings.*;
+import static org.acra.processor.util.Strings.PACKAGE;
+import static org.acra.processor.util.Strings.PARAM_0;
+import static org.acra.processor.util.Strings.VAR_ANNOTATION;
 
 /**
  * @author F43nd1r
@@ -146,7 +161,11 @@ public class ClassCreator {
                 .addMethod(Types.overriding(Types.getOnlyMethod(processingEnv, Strings.CONFIGURATION_BUILDER_FACTORY))
                         .addAnnotation(Types.NON_NULL)
                         .addStatement("return new $T($L)", ClassName.get(PACKAGE, builderName), PARAM_0)
-                        .build())
+                        .build()).addMethod(
+                        Types.overriding(Types.getOnlyMethod(processingEnv, "org.acra.plugins.Plugin"))
+                                .addStatement("return true", "true")
+                                .build()
+                )
                 .build());
     }
 }

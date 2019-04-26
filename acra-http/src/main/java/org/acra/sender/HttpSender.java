@@ -20,9 +20,11 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Pair;
+
 import org.acra.ACRA;
 import org.acra.ACRAConstants;
 import org.acra.ReportField;
+import org.acra.attachment.AttachmentUriProvider;
 import org.acra.attachment.DefaultAttachmentProvider;
 import org.acra.config.ConfigUtils;
 import org.acra.config.CoreConfiguration;
@@ -121,7 +123,13 @@ public class HttpSender implements ReportSender {
             final String password = mPassword != null ? mPassword : isNull(httpConfig.basicAuthPassword()) ? null : httpConfig.basicAuthPassword();
 
             final InstanceCreator instanceCreator = new InstanceCreator();
-            final List<Uri> uris = instanceCreator.create(config.attachmentUriProvider(), DefaultAttachmentProvider::new).getAttachments(context, config);
+            final List<Uri> uris = instanceCreator.create(config.attachmentUriProvider(), new InstanceCreator.Fallback<AttachmentUriProvider>() {
+                @NonNull
+                @Override
+                public AttachmentUriProvider get() {
+                    return new DefaultAttachmentProvider();
+                }
+            }).getAttachments(context, config);
 
             // Generate report body depending on requested type
             final String reportAsString = convertToString(report, mType);
