@@ -157,8 +157,11 @@ public class ErrorReporterImpl implements Thread.UncaughtExceptionHandler, Share
                     .uncaughtExceptionThread(t)
                     .exception(e)
                     .customData(customData)
-                    .endApplication()
+//                    .endApplication()
                     .build(reportExecutor);
+
+            //交给系统处理异常。
+            reportExecutor.handReportToDefaultExceptionHandler(t, e);
 
         } catch (Exception fatality) {
             // ACRA failed. Prevent any recursive call to ACRA.uncaughtException(), let the native reporter do its job.
